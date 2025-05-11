@@ -1,16 +1,21 @@
 import express from "express";
-import usuariosRoutes from "./routes/usuarios.routes.js"
-
+import cors from "cors";
+import usuariosRoutes from "./routes/usuarios.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import productRoutes from "./routes/product.routes.js";
+import cartRoutes    from "./routes/cart.routes.js";
 
 const app = express();
 
-
-
-app.set("port",5000);
-
+app.set("port", 5000);
+app.use(cors());
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
 
 /* routes */
-app.use("/api/usuarios",usuariosRoutes);
-
+app.use("/api/usuarios", usuariosRoutes);
+app.use("/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 export default app;
