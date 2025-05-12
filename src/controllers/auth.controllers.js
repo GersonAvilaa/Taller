@@ -1,4 +1,5 @@
-import getConnection from "../db/database.js";
+import { getConnection } from "../db/database.js"; // ✅ CORRECTO
+
 import bcrypt from "bcrypt";
 
 // Login

@@ -1,4 +1,5 @@
-import getConnection from "../db/database.js";
+import { getConnection } from "../db/database.js";
+
 
 export const methodDB = {
   getAll: async () => {

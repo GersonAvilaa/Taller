@@ -1,4 +1,5 @@
-import getConnection from "../db/database.js";
+import { getConnection } from "../db/database.js";
+
 
 const buscarUsuarioPorCorreo = async (correo_electronico) => {
     const conn = await getConnection();

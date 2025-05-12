@@ -4,15 +4,27 @@ export const methodHTTP = {
   agregarAlCarrito: async (req, res) => {
     try {
       const { id_usuario, id_producto, cantidad, precio } = req.body;
+
       if (![id_usuario, id_producto, cantidad, precio].every(Boolean)) {
         return res.status(400).json({ mensaje: "Datos incompletos" });
       }
-      const item = await cartModel.addItem({ id_usuario, id_producto, cantidad, precio });
+
+      const total = cantidad * precio;
+
+      const item = await cartModel.addItem({
+        id_usuario,
+        id_producto,
+        cantidad,
+        precio,
+        total
+      });
+
       res.status(201).json(item);
     } catch (err) {
       res.status(500).json({ mensaje: "Error al agregar al carrito", error: err.message });
     }
   },
+
   verCarrito: async (req, res) => {
     try {
       const { id_usuario } = req.params;
