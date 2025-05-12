@@ -15,17 +15,19 @@ const loginUsuario = async (req, res) => {
     const conn = await getConnection();
 
     // Buscar al usuario por correo
-    const [usuario] = await conn.query(
-      "SELECT * FROM usuarios WHERE correo_electronico = ?",
-      [correo_electronico]
-    );
+const [rows] = await conn.query(
+  "SELECT * FROM usuarios WHERE correo_electronico = ?",
+  [correo_electronico]
+);
 
-    if (!usuario) {
-      return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
-    }
+if (rows.length === 0) {
+  return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
+}
 
-    // Comparar contraseña en texto plano con la encriptada
-    const passwordCorrecta = await bcrypt.compare(contrasena, usuario.contrasena);
+const usuario = rows[0];
+
+const passwordCorrecta = await bcrypt.compare(contrasena, usuario.contrasena);
+
 
     if (!passwordCorrecta) {
       return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
@@ -87,14 +89,15 @@ const registrarUsuario = async (req, res) => {
     const conn = await getConnection();
 
     // Verificar si el correo ya está registrado
-    const [usuarioExistente] = await conn.query(
-      "SELECT * FROM usuarios WHERE correo_electronico = ?",
-      [correo_electronico]
-    );
+const [result] = await conn.query(
+  "SELECT * FROM usuarios WHERE correo_electronico = ?",
+  [correo_electronico]
+);
 
-    if (usuarioExistente) {
-      return res.status(409).json({ mensaje: "El correo electrónico ya está registrado" });
-    }
+if (result.length > 0) {
+  return res.status(409).json({ mensaje: "El correo electrónico ya está registrado" });
+}
+
 
     // Hashear la contraseña
     const saltRounds = 10;
@@ -122,5 +125,6 @@ const registrarUsuario = async (req, res) => {
 
 export const methodHTTP = {
   loginUsuario,
-  registrarUsuario
+  registrarUsuario,
 };
+
