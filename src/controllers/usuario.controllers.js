@@ -5,8 +5,10 @@ const getUsuarios = async (req, res) => {
     const usuarios = await usuarioModel.getUsuarios();
     res.json(usuarios);
   } catch (error) {
-    res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
-  }
+  console.error("Error en getUsuarios:", error); 
+  res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
+}
+
 };
 
 const updateUsuario = async (req, res) => {
