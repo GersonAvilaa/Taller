@@ -12,6 +12,10 @@ app.use(cors());
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 
+app.get('/',(req,res)=>{
+    res.send('REST API EN RENDER WITHOUT DATABASE ENDPOINTS')
+})
+
 /* routes */
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/auth", authRoutes);
