@@ -1,4 +1,4 @@
-import { getConnection } from "../db/database.js"; // ✅ CORRECTO
+import { getConnection } from "../db/database.js"; 
 
 import bcrypt from "bcrypt";
 
@@ -33,7 +33,7 @@ const passwordCorrecta = await bcrypt.compare(contrasena, usuario.contrasena);
       return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
     }
 
-    // solo devolver parte segura del usuario
+    // devuelve parte segura del usuario
     const usuarioSeguro = {
       id: usuario.id,
       nombre_completo: usuario.nombre_completo,
@@ -62,7 +62,7 @@ const registrarUsuario = async (req, res) => {
       contrasena
     } = req.body;
 
-    // Validación campos obligatorios
+    // Valida campos obligatorios
     if (
       !nombre_completo || !cedula || !correo_electronico ||
       !numero_telefono || !direccion || !contrasena

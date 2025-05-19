@@ -28,8 +28,8 @@ export const methodHTTP = {
   verCarrito: async (req, res) => {
     try {
       const { id_usuario } = req.params;
-      const items = await cartModel.getByUser(id_usuario);
-      res.status(200).json(items);
+      const data = await cartModel.getCartWithDiscount(id_usuario);
+      res.status(200).json(data);
     } catch (err) {
       res.status(500).json({ mensaje: "Error al obtener carrito", error: err.message });
     }
