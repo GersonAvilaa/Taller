@@ -41,6 +41,12 @@ export const methodDB = {
       [usuario_id]
     );
 
-    return result;
+    // Convierte valores numéricos a enteros
+    return result.map(row => ({
+      ...row,
+      total: Math.round(row.total),
+      precio_unitario: Math.round(row.precio_unitario),
+      subtotal: Math.round(row.subtotal)
+    }));
   }
 };

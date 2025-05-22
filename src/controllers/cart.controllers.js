@@ -1,5 +1,6 @@
 import { methodDB as cartModel } from "../models/cart.model.js";
 
+
 export const methodHTTP = {
   agregarAlCarrito: async (req, res) => {
     try {
@@ -27,8 +28,9 @@ export const methodHTTP = {
 
   verCarrito: async (req, res) => {
     try {
-      const { id_usuario } = req.params;
-      const data = await cartModel.getCartWithDiscount(id_usuario);
+      const { usuarioId } = req; // extraído del token
+      const data = await cartModel.getCartWithDiscount(usuarioId);
+
       res.status(200).json(data);
     } catch (err) {
       res.status(500).json({ mensaje: "Error al obtener carrito", error: err.message });

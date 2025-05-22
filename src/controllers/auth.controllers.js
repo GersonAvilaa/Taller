@@ -1,53 +1,53 @@
-import { getConnection } from "../db/database.js"; 
-
+import { getConnection } from "../db/database.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+// Clave secreta JWT
+const JWT_SECRET = "clave_super_secreta"; 
 
 // Login
 const loginUsuario = async (req, res) => {
   try {
     const { correo_electronico, contrasena } = req.body;
 
-    // Validar que los campos estén presentes
     if (!correo_electronico || !contrasena) {
       return res.status(400).json({ mensaje: "Correo y contraseña son obligatorios" });
     }
 
     const conn = await getConnection();
+    const [rows] = await conn.query(
+      "SELECT * FROM usuarios WHERE correo_electronico = ?",
+      [correo_electronico]
+    );
 
-    // Buscar al usuario por correo
-const [rows] = await conn.query(
-  "SELECT * FROM usuarios WHERE correo_electronico = ?",
-  [correo_electronico]
-);
+    if (rows.length === 0) {
+      return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
+    }
 
-if (rows.length === 0) {
-  return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
-}
-
-const usuario = rows[0];
-
-const passwordCorrecta = await bcrypt.compare(contrasena, usuario.contrasena);
-
+    const usuario = rows[0];
+    const passwordCorrecta = await bcrypt.compare(contrasena, usuario.contrasena);
 
     if (!passwordCorrecta) {
       return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
     }
 
-    // devuelve parte segura del usuario
-    const usuarioSeguro = {
-      id: usuario.id,
-      nombre_completo: usuario.nombre_completo,
-      correo_electronico: usuario.correo_electronico
-    };
+    // Generar token JWT
+    const token = jwt.sign({ id: usuario.id }, JWT_SECRET, { expiresIn: "1h" });
 
     res.status(200).json({
       mensaje: "Inicio de sesión exitoso",
-      usuario: usuarioSeguro
+      token,
+      usuario: {
+        id: usuario.id,
+        nombre_completo: usuario.nombre_completo,
+        correo_electronico: usuario.correo_electronico
+      }
     });
   } catch (error) {
     res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
   }
 };
+
 
 
 // Registro

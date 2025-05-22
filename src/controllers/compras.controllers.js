@@ -5,24 +5,24 @@ import { methodDB as detalleModel } from "../models/detalleCompra.model.js";
 export const methodHTTP = {
   realizarCompra: async (req, res) => {
     try {
-      const { id_usuario } = req.body;
+      const usuarioId = req.usuarioId;
 
-      if (!id_usuario) {
+      if (!usuarioId) {
         return res.status(400).json({ mensaje: "ID de usuario requerido" });
       }
 
-      const carrito = await cartModel.getCartWithDiscount(id_usuario);
+      const carrito = await cartModel.getCartWithDiscount(usuarioId);
       if (!carrito.productos.length) {
         return res.status(400).json({ mensaje: "El carrito está vacío" });
       }
 
       const compraId = await compraModel.registrarCompra({
-        usuario_id: id_usuario,
+        usuario_id: usuarioId,
         total: carrito.total
       });
 
       await detalleModel.guardarDetalles(compraId, carrito.productos);
-      await compraModel.limpiarCarrito(id_usuario);
+      await compraModel.limpiarCarrito(usuarioId);
 
       res.status(201).json({
         mensaje: "Compra realizada con éxito",
@@ -38,9 +38,9 @@ export const methodHTTP = {
 
   historialCompras: async (req, res) => {
     try {
-      const { id_usuario } = req.params;
+      const usuarioId = req.usuarioId;
 
-      const historial = await detalleModel.obtenerDetallesPorUsuario(id_usuario);
+      const historial = await detalleModel.obtenerDetallesPorUsuario(usuarioId);
 
       res.status(200).json(historial);
     } catch (error) {
@@ -48,3 +48,4 @@ export const methodHTTP = {
     }
   }
 };
+

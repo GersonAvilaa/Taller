@@ -4,6 +4,7 @@ import usuariosRoutes from "./routes/usuarios.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import cartRoutes    from "./routes/cart.routes.js";
+import comprasRoutes from "./routes/compras.routes.js";
 
 const app = express();
 
@@ -21,5 +22,7 @@ app.use("/api/usuarios", usuariosRoutes);
 app.use("/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/compras", comprasRoutes);
+
 
 export default app;
