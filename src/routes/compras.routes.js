@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { methodHTTP as compraController } from "../controllers/compras.controller.js";
+import { methodHTTP as compraController } from "../controllers/compras.controllers.js";
 import { verificarToken } from "../middlewares/auth.middleware.js";
 
 const router = Router();
