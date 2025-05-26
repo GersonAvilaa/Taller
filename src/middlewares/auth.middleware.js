@@ -13,7 +13,7 @@ export const verificarToken = (req, res, next) => {
 
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    req.usuarioId = payload.id; // lo usamos luego en los controladores
+    req.usuarioId = payload.id; 
     next();
   } catch (error) {
     return res.status(401).json({ mensaje: "Token inválido o expirado" });

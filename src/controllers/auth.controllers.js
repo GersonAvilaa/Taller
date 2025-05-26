@@ -2,10 +2,6 @@ import { getConnection } from "../db/database.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-// Clave secreta JWT
-const JWT_SECRET = "clave_super_secreta"; 
-
-// Login
 const loginUsuario = async (req, res) => {
   try {
     const { correo_electronico, contrasena } = req.body;
@@ -15,34 +11,43 @@ const loginUsuario = async (req, res) => {
     }
 
     const conn = await getConnection();
-    const [rows] = await conn.query(
-      "SELECT * FROM usuarios WHERE correo_electronico = ?",
-      [correo_electronico]
-    );
+    try {
+      const [rows] = await conn.query(
+        "SELECT * FROM usuarios WHERE correo_electronico = ?",
+        [correo_electronico]
+      );
 
-    if (rows.length === 0) {
-      return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
-    }
+      if (rows.length === 0) {
+        return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
+      }
 
-    const usuario = rows[0];
-    const passwordCorrecta = await bcrypt.compare(contrasena, usuario.contrasena);
+      const usuario = rows[0];
+      const passwordCorrecta = await bcrypt.compare(contrasena, usuario.contrasena);
 
-    if (!passwordCorrecta) {
-      return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
-    }
+      if (!passwordCorrecta) {
+        return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
+      }
 
-    // Generar token JWT
-    const token = jwt.sign({ id: usuario.id }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign(
+        { id: usuario.id },
+        "clave_secreta_para_firmar", // deberías moverla a .env
+        { expiresIn: "2h" }
+      );
 
-    res.status(200).json({
-      mensaje: "Inicio de sesión exitoso",
-      token,
-      usuario: {
+      const usuarioSeguro = {
         id: usuario.id,
         nombre_completo: usuario.nombre_completo,
         correo_electronico: usuario.correo_electronico
-      }
-    });
+      };
+
+      res.status(200).json({
+        mensaje: "Inicio de sesión exitoso",
+        token,
+        usuario: usuarioSeguro
+      });
+    } finally {
+      conn.release();
+    }
   } catch (error) {
     res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
   }
@@ -89,14 +94,14 @@ const registrarUsuario = async (req, res) => {
     const conn = await getConnection();
 
     // Verificar si el correo ya está registrado
-const [result] = await conn.query(
-  "SELECT * FROM usuarios WHERE correo_electronico = ?",
-  [correo_electronico]
-);
+    const [result] = await conn.query(
+   "SELECT * FROM usuarios WHERE correo_electronico = ?",
+   [correo_electronico]
+    );
 
-if (result.length > 0) {
+   if (result.length > 0) {
   return res.status(409).json({ mensaje: "El correo electrónico ya está registrado" });
-}
+   }
 
 
     // Hashear la contraseña
@@ -116,9 +121,11 @@ if (result.length > 0) {
         correo_electronico
       }
     });
-  } catch (error) {
+   } catch (error) {
     res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
-  }
+   }finally {
+  conn.release(); 
+}
 };
 
 

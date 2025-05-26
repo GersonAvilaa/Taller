@@ -2,23 +2,28 @@ import { getConnection } from "../db/database.js";
 
 export const methodDB = {
   addItem: async ({ id_usuario, id_producto, cantidad, precio }) => {
-    const conn  = await getConnection();
+    const conn = await getConnection();
     const total = cantidad * precio;
-    const result = await conn.query(
-      `INSERT INTO carrito (id_usuario, id_producto, cantidad, precio, total)
-       VALUES (?, ?, ?, ?, ?)`,
-      [id_usuario, id_producto, cantidad, precio, total]
-    );
-    return { id: result.insertId, id_usuario, id_producto, cantidad, precio, total };
+    try {
+      const [result] = await conn.query(
+        `INSERT INTO carrito (id_usuario, id_producto, cantidad, precio, total)
+         VALUES (?, ?, ?, ?, ?)`,
+        [id_usuario, id_producto, cantidad, precio, total]
+      );
+      return { id: result.insertId, id_usuario, id_producto, cantidad, precio, total };
+    } finally {
+      conn.release();
+    }
   },
 
   getByUser: async (id_usuario) => {
     const conn = await getConnection();
-    const [items] = await conn.query(
-      "SELECT * FROM carrito WHERE id_usuario = ?",
-      [id_usuario]
-    );
-    return items;
+    try {
+      const [items] = await conn.query("SELECT * FROM carrito WHERE id_usuario = ?", [id_usuario]);
+      return items;
+    } finally {
+      conn.release();
+    }
   },
 
   getCartWithDiscount: async (id_usuario) => {
