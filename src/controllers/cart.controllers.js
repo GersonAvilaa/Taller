@@ -3,9 +3,9 @@ import { methodDB as cartModel } from "../models/cart.model.js";
 
 export const methodHTTP = {
   verCarrito: async (req, res) => {
-    try {
-      const { id_usuario } = req.params;
-      const carrito = await cartModel.getByUser(id_usuario);
+  try {
+    const { usuarioId } = req; // extraído del token
+    const data = await cartModel.getCartWithDiscount(usuarioId);
 
       const productos = carrito;
       const subtotal = productos.reduce((sum, item) => sum + item.total, 0);
@@ -19,14 +19,9 @@ export const methodHTTP = {
 
       const total = subtotal - descuento;
 
-      res.status(200).json({
-        productos,
-        subtotal: Math.round(subtotal),
-        descuento_aplicado: descuento,
-        total: Math.round(total)
-      });
-    } catch (err) {
-      res.status(500).json({ mensaje: "Error al obtener carrito", error: err.message });
-    }
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ mensaje: "Error al obtener carrito", error: err.message });
   }
+}
 };
