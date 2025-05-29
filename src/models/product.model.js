@@ -1,3 +1,5 @@
+import { getConnection } from "../db/database.js";
+
 export const methodDB = {
   getAll: async () => {
     const conn = await getConnection();
@@ -5,9 +7,10 @@ export const methodDB = {
       const [rows] = await conn.query("SELECT * FROM productos");
       return rows;
     } finally {
-      conn.release(); 
+      conn.release();
     }
   },
+
   getById: async (id) => {
     const conn = await getConnection();
     try {

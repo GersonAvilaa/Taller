@@ -9,6 +9,7 @@ export const methodHTTP = {
       res.status(500).json({ mensaje: "Error al listar productos", error: err.message });
     }
   },
+
   obtenerProducto: async (req, res) => {
     try {
       const { id } = req.params;
