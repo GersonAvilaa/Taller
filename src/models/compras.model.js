@@ -5,7 +5,7 @@ export const methodDB = {
     const conn = await getConnection();
     try {
       const [result] = await conn.query(
-        "INSERT INTO compras (id_usuario, total_pagado) VALUES (?, ?)",
+        "INSERT INTO compras (usuario_id, total) VALUES (?, ?)",
         [usuario_id, total]
       );
       return result.insertId;
