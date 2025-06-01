@@ -7,6 +7,7 @@ export const methodHTTP = {
       if (![id_usuario, id_producto, cantidad, precio].every(Boolean)) {
         return res.status(400).json({ mensaje: "Datos incompletos" });
       }
+
       const item = await cartModel.addItem({ id_usuario, id_producto, cantidad, precio });
       res.status(201).json(item);
     } catch (err) {
@@ -16,7 +17,7 @@ export const methodHTTP = {
 
   verCarrito: async (req, res) => {
     try {
-     const id_usuario = req.usuarioId; 
+      const id_usuario = req.usuarioId;
       const data = await cartModel.getCartWithDiscount(id_usuario);
       res.status(200).json(data);
     } catch (err) {

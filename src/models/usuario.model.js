@@ -4,7 +4,7 @@ export const methodDB = {
   getUsuarios: async () => {
     const conn = await getConnection();
     try {
-      const [rows] = await conn.query("SELECT id, nombre_completo, cedula, correo_electronico, numero_telefono, direccion, contrasena FROM usuarios");
+      const [rows] = await conn.query("SELECT * FROM usuarios");
       return rows;
     } finally {
       conn.release();
@@ -16,7 +16,7 @@ export const methodDB = {
     try {
       const { nombre_completo, cedula, correo_electronico, numero_telefono, direccion, contrasena } = datos;
       await conn.query(
-        "UPDATE usuarios SET nombre_completo = ?, cedula = ?, correo_electronico = ?, numero_telefono = ?, direccion = ?, contrasena = ? WHERE id = ?",
+        "UPDATE usuarios SET nombre_completo=?, cedula=?, correo_electronico=?, numero_telefono=?, direccion=?, contrasena=? WHERE id=?",
         [nombre_completo, cedula, correo_electronico, numero_telefono, direccion, contrasena, id]
       );
     } finally {
@@ -27,7 +27,7 @@ export const methodDB = {
   deleteUsuario: async (id) => {
     const conn = await getConnection();
     try {
-      await conn.query("DELETE FROM usuarios WHERE id = ?", [id]);
+      await conn.query("DELETE FROM usuarios WHERE id=?", [id]);
     } finally {
       conn.release();
     }

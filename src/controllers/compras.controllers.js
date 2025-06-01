@@ -6,7 +6,6 @@ export const methodHTTP = {
   realizarCompra: async (req, res) => {
     try {
       const usuarioId = req.usuarioId;
-
       if (!usuarioId) {
         return res.status(400).json({ mensaje: "ID de usuario requerido" });
       }
@@ -31,21 +30,18 @@ export const methodHTTP = {
         descuento: carrito.descuento_aplicado,
         total_pagado: carrito.total
       });
-    } catch (error) {
-      res.status(500).json({ mensaje: "Error al realizar la compra", error: error.message });
+    } catch (err) {
+      res.status(500).json({ mensaje: "Error al realizar la compra", error: err.message });
     }
   },
 
   historialCompras: async (req, res) => {
     try {
       const usuarioId = req.usuarioId;
-
       const historial = await detalleModel.obtenerDetallesPorUsuario(usuarioId);
-
       res.status(200).json(historial);
-    } catch (error) {
-      res.status(500).json({ mensaje: "Error al obtener historial", error: error.message });
+    } catch (err) {
+      res.status(500).json({ mensaje: "Error al obtener historial", error: err.message });
     }
   }
 };
-

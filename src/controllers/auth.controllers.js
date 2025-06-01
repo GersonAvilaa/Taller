@@ -2,12 +2,13 @@ import { getConnection } from "../db/database.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const JWT_SECRET = "clave_super_secreta";
+
 const loginUsuario = async (req, res) => {
   try {
     const { correo_electronico, contrasena } = req.body;
-
     if (!correo_electronico || !contrasena) {
-      return res.status(400).json({ mensaje: "Correo y contraseña son obligatorios" });
+      return res.status(400).json({ mensaje: "Correo y contraseña obligatorios" });
     }
 
     const conn = await getConnection();
@@ -17,120 +18,86 @@ const loginUsuario = async (req, res) => {
         [correo_electronico]
       );
 
-      if (rows.length === 0) {
+      if (!rows.length) {
         return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
       }
 
       const usuario = rows[0];
       const passwordCorrecta = await bcrypt.compare(contrasena, usuario.contrasena);
-
       if (!passwordCorrecta) {
         return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
       }
 
-      // ✅ Incluimos nombre y correo en el token
       const token = jwt.sign(
         {
           id: usuario.id,
           nombre_completo: usuario.nombre_completo,
           correo_electronico: usuario.correo_electronico
         },
-        "clave_super_secreta", // Reemplázalo luego por process.env.JWT_SECRET
+        JWT_SECRET,
         { expiresIn: "2h" }
       );
 
-      res.status(200).json({
-        mensaje: "Inicio de sesión exitoso",
-        token
-      });
+      res.status(200).json({ mensaje: "Inicio de sesión exitoso", token });
     } finally {
       conn.release();
     }
-  } catch (error) {
-    res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
+  } catch (err) {
+    res.status(500).json({ mensaje: "Error del servidor", error: err.message });
   }
 };
 
-
-
-
-// Registro
 const registrarUsuario = async (req, res) => {
+  let conn;
   try {
     const {
-      nombre_completo,
-      cedula,
-      correo_electronico,
-      numero_telefono,
-      direccion,
-      contrasena
+      nombre_completo, cedula, correo_electronico,
+      numero_telefono, direccion, contrasena
     } = req.body;
 
-    // Valida campos obligatorios
-    if (
-      !nombre_completo || !cedula || !correo_electronico ||
-      !numero_telefono || !direccion || !contrasena
-    ) {
+    if (![nombre_completo, cedula, correo_electronico, numero_telefono, direccion, contrasena].every(Boolean)) {
       return res.status(400).json({ mensaje: "Todos los campos son obligatorios" });
     }
 
-    // Validar que cedula y teléfono sean numéricos
     if (isNaN(cedula) || isNaN(numero_telefono)) {
-      return res.status(400).json({ mensaje: "Cédula y número de teléfono deben ser numéricos" });
+      return res.status(400).json({ mensaje: "Cédula y teléfono deben ser numéricos" });
     }
 
-    // Validar correo electrónico
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(correo_electronico)) {
-      return res.status(400).json({ mensaje: "Correo electrónico no tiene un formato válido" });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo_electronico)) {
+      return res.status(400).json({ mensaje: "Correo inválido" });
     }
 
-    // Validar longitud mínima de la contraseña
     if (contrasena.length < 5) {
       return res.status(400).json({ mensaje: "La contraseña debe tener al menos 5 caracteres" });
     }
 
-    const conn = await getConnection();
+    conn = await getConnection();
 
-    // Verificar si el correo ya está registrado
-    const [result] = await conn.query(
-   "SELECT * FROM usuarios WHERE correo_electronico = ?",
-   [correo_electronico]
+    const [existe] = await conn.query(
+      "SELECT * FROM usuarios WHERE correo_electronico = ?",
+      [correo_electronico]
     );
 
-   if (result.length > 0) {
-  return res.status(409).json({ mensaje: "El correo electrónico ya está registrado" });
-   }
+    if (existe.length > 0) {
+      return res.status(409).json({ mensaje: "Correo ya registrado" });
+    }
 
+    const hashedPassword = await bcrypt.hash(contrasena, 10);
 
-    // Hashear la contraseña
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(contrasena, saltRounds);
-
-    // Insertar nuevo usuario
     await conn.query(
       "INSERT INTO usuarios (nombre_completo, cedula, correo_electronico, numero_telefono, direccion, contrasena) VALUES (?, ?, ?, ?, ?, ?)",
       [nombre_completo, cedula, correo_electronico, numero_telefono, direccion, hashedPassword]
     );
 
-    res.status(201).json({
-      mensaje: "Usuario registrado exitosamente",
-      usuario: {
-        nombre_completo,
-        correo_electronico
-      }
-    });
-   } catch (error) {
-    res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
-   }finally {
-  conn.release(); 
-}
+    res.status(201).json({ mensaje: "Usuario registrado correctamente" });
+  } catch (err) {
+    res.status(500).json({ mensaje: "Error al registrar", error: err.message });
+  } finally {
+    if (conn) conn.release();
+  }
 };
-
-
 
 export const methodHTTP = {
   loginUsuario,
-  registrarUsuario,
+  registrarUsuario
 };
-

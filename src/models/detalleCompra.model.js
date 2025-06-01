@@ -13,9 +13,8 @@ export const methodDB = {
       ]);
 
       await conn.query(
-        `INSERT INTO detalle_compra 
-        (compra_id, producto_id, cantidad, precio_unitario, subtotal)
-        VALUES ?`,
+        `INSERT INTO detalle_compra (compra_id, producto_id, cantidad, precio_unitario, subtotal)
+         VALUES ?`,
         [values]
       );
     } finally {
@@ -28,19 +27,19 @@ export const methodDB = {
     try {
       const [result] = await conn.query(
         `SELECT 
-          c.id AS id_compra,
-          c.fecha,
-          c.total,
-          dc.producto_id,
-          p.nombre AS nombre_producto,
-          dc.cantidad,
-          dc.precio_unitario,
-          dc.subtotal
-        FROM compras c
-        JOIN detalle_compra dc ON c.id = dc.compra_id
-        JOIN productos p ON p.id = dc.producto_id
-        WHERE c.usuario_id = ?
-        ORDER BY c.fecha DESC`,
+           c.id AS id_compra,
+           c.fecha,
+           c.total,
+           dc.producto_id,
+           p.nombre AS nombre_producto,
+           dc.cantidad,
+           dc.precio_unitario,
+           dc.subtotal
+         FROM compras c
+         JOIN detalle_compra dc ON c.id = dc.compra_id
+         JOIN productos p ON p.id = dc.producto_id
+         WHERE c.usuario_id = ?
+         ORDER BY c.fecha DESC`,
         [usuario_id]
       );
 

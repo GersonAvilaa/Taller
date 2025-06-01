@@ -21,5 +21,3 @@ export const methodDB = {
     }
   }
 };
-
-//liberacion garantizada
