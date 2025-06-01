@@ -6,10 +6,8 @@ export const methodDB = {
     try {
       const [rows] = await conn.query("SELECT * FROM productos");
       return rows;
-    } catch (error) {
-      throw error;
     } finally {
-      conn.release(); // ✅ Importante liberar conexión
+      conn.release();
     }
   },
 
@@ -18,10 +16,10 @@ export const methodDB = {
     try {
       const [rows] = await conn.query("SELECT * FROM productos WHERE id = ?", [id]);
       return rows[0];
-    } catch (error) {
-      throw error;
     } finally {
-      conn.release(); // ✅ Importante liberar conexión
+      conn.release();
     }
   }
 };
+
+//liberacion garantizada
