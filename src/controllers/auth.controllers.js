@@ -28,22 +28,20 @@ const loginUsuario = async (req, res) => {
         return res.status(401).json({ mensaje: "Correo o contraseña incorrectos" });
       }
 
+      // ✅ Incluimos nombre y correo en el token
       const token = jwt.sign(
-        { id: usuario.id },
-        "clave_secreta_para_firmar", // deberías moverla a .env
+        {
+          id: usuario.id,
+          nombre_completo: usuario.nombre_completo,
+          correo_electronico: usuario.correo_electronico
+        },
+        "clave_super_secreta", // Reemplázalo luego por process.env.JWT_SECRET
         { expiresIn: "2h" }
       );
 
-      const usuarioSeguro = {
-        id: usuario.id,
-        nombre_completo: usuario.nombre_completo,
-        correo_electronico: usuario.correo_electronico
-      };
-
       res.status(200).json({
         mensaje: "Inicio de sesión exitoso",
-        token,
-        usuario: usuarioSeguro
+        token
       });
     } finally {
       conn.release();
@@ -52,6 +50,7 @@ const loginUsuario = async (req, res) => {
     res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
   }
 };
+
 
 
 
