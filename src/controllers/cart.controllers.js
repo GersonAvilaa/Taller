@@ -4,8 +4,13 @@ export const methodHTTP = {
   agregarAlCarrito: async (req, res) => {
     try {
       const { id_usuario, id_producto, cantidad, precio } = req.body;
-      if (![id_usuario, id_producto, cantidad, precio].every(Boolean)) {
-        return res.status(400).json({ mensaje: "Datos incompletos" });
+
+      if (
+        !id_usuario || !id_producto ||
+        isNaN(cantidad) || cantidad <= 0 ||
+        isNaN(precio) || precio <= 0
+      ) {
+        return res.status(400).json({ mensaje: "Datos inválidos" });
       }
 
       const item = await cartModel.addItem({ id_usuario, id_producto, cantidad, precio });
@@ -28,9 +33,14 @@ export const methodHTTP = {
   actualizarCantidad: async (req, res) => {
     try {
       const { id_usuario, id_producto, cantidad } = req.body;
-      if (![id_usuario, id_producto, cantidad].every(Boolean)) {
-        return res.status(400).json({ mensaje: "Datos incompletos" });
+
+      if (
+        !id_usuario || !id_producto ||
+        isNaN(cantidad) || cantidad <= 0
+      ) {
+        return res.status(400).json({ mensaje: "Datos inválidos para actualización" });
       }
+
       await cartModel.actualizarCantidad({ id_usuario, id_producto, cantidad });
       res.status(200).json({ mensaje: "Cantidad actualizada" });
     } catch (err) {
