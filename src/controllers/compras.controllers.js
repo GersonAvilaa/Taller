@@ -11,7 +11,7 @@ export const methodHTTP = {
       }
 
       const carrito = await cartModel.getCartWithDiscount(usuarioId);
-      if (!carrito.productos || carrito.productos.length === 0) {
+      if (!carrito.productos.length) {
         return res.status(400).json({ mensaje: "El carrito está vacío" });
       }
 
