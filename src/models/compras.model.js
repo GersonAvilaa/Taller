@@ -10,7 +10,7 @@ export const methodDB = {
       );
       return result.insertId;
     } finally {
-      conn.release();
+      conn.release(); // ✅ liberamos correctamente
     }
   },
 
@@ -19,7 +19,7 @@ export const methodDB = {
     try {
       await conn.query("DELETE FROM carrito WHERE id_usuario = ?", [usuario_id]);
     } finally {
-      conn.release();
+      conn.release(); // ✅ evitamos saturación
     }
   }
 };

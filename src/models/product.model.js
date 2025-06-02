@@ -7,7 +7,7 @@ export const methodDB = {
       const [rows] = await conn.query("SELECT * FROM productos");
       return rows;
     } finally {
-      conn.release();
+      conn.release(); // ✅ evita saturación de conexiones
     }
   },
 
@@ -17,7 +17,7 @@ export const methodDB = {
       const [rows] = await conn.query("SELECT * FROM productos WHERE id = ?", [id]);
       return rows[0];
     } finally {
-      conn.release();
+      conn.release(); // ✅ importante
     }
   }
 };
