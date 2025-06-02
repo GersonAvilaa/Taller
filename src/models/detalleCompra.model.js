@@ -6,7 +6,7 @@ export const methodDB = {
     try {
       const values = productos.map(p => [
         compra_id,
-        p.id_producto,
+        p.id,
         p.cantidad,
         p.precio,
         p.total
@@ -44,9 +44,14 @@ export const methodDB = {
         [usuario_id]
       );
 
+      // Agrupamos resultados para facilitar uso en historial.js y confirmación
       return result.map(row => ({
-        ...row,
+        id_compra: row.id_compra,
+        fecha: row.fecha,
         total: Math.round(row.total),
+        producto_id: row.producto_id,
+        nombre_producto: row.nombre_producto,
+        cantidad: row.cantidad,
         precio_unitario: Math.round(row.precio_unitario),
         subtotal: Math.round(row.subtotal)
       }));
