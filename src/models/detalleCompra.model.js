@@ -13,8 +13,9 @@ export const methodDB = {
       ]);
 
       await conn.query(
-        `INSERT INTO detalle_compra (compra_id, producto_id, cantidad, precio_unitario, subtotal)
-         VALUES ?`,
+        `INSERT INTO detalle_compra 
+        (compra_id, producto_id, cantidad, precio_unitario, subtotal)
+        VALUES ?`,
         [values]
       );
     } finally {
