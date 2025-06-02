@@ -6,20 +6,10 @@ export const methodHTTP = {
   realizarCompra: async (req, res) => {
     try {
       const usuarioId = req.usuarioId;
-
-      if (!usuarioId) {
-        return res.status(400).json({ mensaje: "ID de usuario requerido" });
-      }
-
       const carrito = await cartModel.getCartWithDiscount(usuarioId);
-      if (!carrito.productos || !carrito.productos.length) {
-        return res.status(400).json({ mensaje: "El carrito está vacío" });
-      }
 
-      // Validar precios y cantidades
-      const invalid = carrito.productos.some(p => isNaN(p.cantidad) || isNaN(p.precio) || p.cantidad <= 0 || p.precio <= 0);
-      if (invalid) {
-        return res.status(400).json({ mensaje: "Producto con cantidad o precio inválido" });
+      if (!carrito.productos || carrito.productos.length === 0) {
+        return res.status(400).json({ mensaje: "El carrito está vacío" });
       }
 
       const compraId = await compraModel.registrarCompra({
@@ -34,9 +24,10 @@ export const methodHTTP = {
         mensaje: "Compra realizada con éxito",
         id_compra: compraId,
         subtotal: carrito.subtotal,
-        descuento: carrito.descuento_aplicado,
+        descuento_aplicado: carrito.descuento_aplicado,
         total_pagado: carrito.total
       });
+
     } catch (error) {
       res.status(500).json({ mensaje: "Error al realizar la compra", error: error.message });
     }
@@ -45,7 +36,6 @@ export const methodHTTP = {
   historialCompras: async (req, res) => {
     try {
       const usuarioId = req.usuarioId;
-
       const historial = await detalleModel.obtenerDetallesPorUsuario(usuarioId);
       res.status(200).json(historial);
     } catch (error) {
