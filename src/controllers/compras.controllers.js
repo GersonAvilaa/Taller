@@ -6,6 +6,7 @@ export const methodHTTP = {
   realizarCompra: async (req, res) => {
     try {
       const usuarioId = req.usuarioId;
+
       if (!usuarioId) {
         return res.status(400).json({ mensaje: "ID de usuario requerido" });
       }
